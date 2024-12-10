@@ -1,7 +1,15 @@
 from rest_framework import serializers
 from django.contrib.auth.hashers import make_password
 from .models import *
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
+
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    def validate(self, attrs):
+        data = super().validate(attrs)
+        data['is_superuser'] = self.user.is_superuser
+        data['is_organizer'] = self.user.is_organizer
+        return data
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:

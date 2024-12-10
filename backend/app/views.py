@@ -7,7 +7,14 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from .models import *
 from .serializers import *
+from .permissions import *
+from rest_framework_simplejwt.views import TokenObtainPairView
+from django.views.decorators.csrf import csrf_exempt
 
+
+#@csrf_exempt
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
 
 #@csrf_exempt
 @api_view(['POST'])
@@ -21,7 +28,7 @@ def UserCreate(request):
         return JsonResponse(status=status.HTTP_422_UNPROCESSABLE_ENTITY, data=serializer.errors)
 
 @api_view(['GET'])
-@permission_classes([permissions.IsAuthenticated]) 
+@permission_classes([permissions.IsAuthenticated&IsSuperUser]) 
 def UserList(request):
     output = {}
     output["list"] = list(User.objects.values())
