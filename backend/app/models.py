@@ -1,17 +1,28 @@
 from django.db import models
+from django.core.validators import RegexValidator
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
+from .managers import UserManager
+
+email_validator = RegexValidator(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$', 'Invalid email address')
 
 
-class User(models.Model):
+class User(AbstractBaseUser, PermissionsMixin):
     name = models.CharField(max_length=255)
-    email = models.EmailField(max_length=255, unique=True)
+    email = models.EmailField(max_length=255, validators=email_validator, unique=True)
     password_hash = models.CharField(max_length=300)
-    permissions = ['ADMIN', 'USER', 'ORGANIZER']
+    is_superuser = models.BooleanField(default=False)
+    is_organizer = models.BooleanField(default=False)
     phone_number = models.CharField(max_length=15, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['name']
+
+    objects = UserManager()
+
     def __str__(self):
-        return self.name + ' - ' + self.email + ' - ' + self.permissions
+        return self.name + ' - ' + self.email
 
 class Organizer(models.Model):
     name = models.CharField(max_length=255)

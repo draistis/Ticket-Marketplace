@@ -3,5 +3,6 @@ from . import views
 
 
 urlpatterns = [
-    path('users/', views.UserListCreate.as_view(), name='user-list-create'),
+    path('user/list/', views.UserList.as_view(), name='user-list'),
+    path('user/create/', views.UserCreate.as_view(), name='user-create'),
 ]

@@ -1,6 +1,6 @@
 from django.contrib import admin
+from .models import Coupon, Event, Location, Organizer, User
 
-from backend.app.models import Coupon, Event, Location, Organizer, User
 
 admin.site.register(User)
 admin.site.register(Organizer)
