@@ -11,6 +11,7 @@ from .serializers import *
 
 #@csrf_exempt
 @api_view(['POST'])
+@permission_classes([permissions.AllowAny])
 def UserCreate(request):
     serializer = UserSerializer(data=request.data)
     if serializer.is_valid():

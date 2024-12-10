@@ -18,6 +18,6 @@ class UserManager(BaseUserManager):
     
     def create_organizer(self, email, password, **extra_fields):
         extra_fields.setdefault("is_organizer", True)
-        if extra_fields.get("is_oraganizer") is not True:
+        if extra_fields.get("is_organizer") is not True:
             raise ValueError(("Organizer must have is_organizer=True."))
         return self.create_user(email, password, **extra_fields)
