@@ -1,15 +1,11 @@
 from django.http import JsonResponse
-from rest_framework import generics, status, permissions
-from rest_framework.decorators import authentication_classes, permission_classes, api_view
-from rest_framework.permissions import SAFE_METHODS, BasePermission
-from rest_framework_simplejwt import authentication
-from rest_framework.views import APIView
+from rest_framework import status, permissions
+from rest_framework.decorators import permission_classes, api_view
 from rest_framework.response import Response
 from .models import *
 from .serializers import *
 from .permissions import *
 from rest_framework_simplejwt.views import TokenObtainPairView
-from django.views.decorators.csrf import csrf_exempt
 
 
 class CustomTokenObtainPairView(TokenObtainPairView):
@@ -85,4 +81,66 @@ def LocationDetail(request, pk):
     
     elif request.method == 'DELETE':        
         location.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    
+# api/event/
+@api_view(['POST', 'GET'])
+@permission_classes([IsSuperUserOrReadOnly])
+def EventList(request):
+    if request.method == 'POST':
+        serializer = EventSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+    
+    elif request.method == 'GET':
+        events = Event.objects.all()
+        # Query
+        query = request.query_params.get('query', None)
+        if query:
+            events = events.filter(name__icontains=query) | events.filter(description__icontains=query)
+        # Filters
+        category = request.query_params.get('category', None)
+        start_datetime = request.query_params.get('start_datetime', None)
+        city = request.query_params.get('city', None)
+        country = request.query_params.get('country', None)
+        if category:
+            events = events.filter(category__icontains=category)
+        if start_datetime:
+            events = events.filter(start_datetime >= start_datetime)
+        if city:
+            events = events.filter(location__city__icontains=city)
+        if country:
+            events = events.filter(location__country__icontains=country)
+        # Sorting
+        sort_by = request.query_params.get('sort_by', None)
+        if sort_by:
+            events = events.order_by(sort_by)
+        # Serialize the data
+        serializer = EventSerializer(events, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+# api/event/<int:pk>/
+@api_view(['GET', 'PATCH', 'DELETE'])
+@permission_classes([IsSuperUserOrReadOnly])
+def EventDetail(request, pk):
+    try:
+        event = Event.objects.get(pk=pk)
+    except Event.DoesNotExist:
+        return Response({"error": "Event not found"}, status=status.HTTP_404_NOT_FOUND)
+    
+    if request.method == 'GET':
+        serializer = EventSerializer(event)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    elif request.method == 'PATCH':        
+        serializer = EventSerializer(event, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+    
+    elif request.method == 'DELETE':        
+        event.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
