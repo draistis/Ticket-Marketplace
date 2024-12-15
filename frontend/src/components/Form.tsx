@@ -38,14 +38,8 @@ function Form({ route, method }: FormProps) {
     return (
         <form onSubmit={handleSubmit} className="form-container">
             <h1>{method}</h1>
-            <label>
-                Email
-                <input className="form-input" type="text" value={email} onChange={(e) => setEmail(e.target.value)} />
-            </label>
-            <label>
-                Password
-                <input className="form-input" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
-            </label>
+                <input className="form-input" type="text" value={email} placeholder="Email" onChange={(e) => setEmail(e.target.value)} />
+                <input className="form-input" type="password" value={password} placeholder="Password" onChange={(e) => setPassword(e.target.value)} />
             <button className="form-button" type="submit" disabled={loading}>{method}</button>
         </form>
     )

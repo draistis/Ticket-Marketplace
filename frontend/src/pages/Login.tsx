@@ -1,8 +1,8 @@
+import Form from '../components/Form'
+
 function Login () {
     return (
-      <div>
-        <h1>Login</h1>
-      </div>
+        <Form route="api/login/" method="Login" />
     );
   }
   

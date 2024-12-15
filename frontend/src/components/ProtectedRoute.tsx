@@ -9,6 +9,23 @@ function ProtectedRoute({ children }: { children: ReactNode }) {
     const [isAuthorizer, setIsAuthorized] = useState<boolean | null>(null)
     
     useEffect(() => {
+        const auth = async () => {
+            const token = localStorage.getItem(ACCESS_TOKEN)
+            if (!token) {
+                setIsAuthorized(false)
+                return
+            }
+            const decoded = jwtDecode(token)
+            const tokenExpiration = decoded.exp
+            const now = Date.now() / 1000
+
+            if (tokenExpiration && tokenExpiration < now) {
+                await refreshToken()
+            } else {
+                setIsAuthorized(true)
+            }
+        }
+
         auth().catch(() => setIsAuthorized(false))
     }, [])
 
@@ -25,23 +42,6 @@ function ProtectedRoute({ children }: { children: ReactNode }) {
         } catch (error) {
             console.error(error)
             setIsAuthorized(false)
-        }
-    }
-
-    const auth = async () => {
-        const token = localStorage.getItem(ACCESS_TOKEN)
-        if (!token) {
-            setIsAuthorized(false)
-            return
-        }
-        const decoded = jwtDecode(token)
-        const tokenExpiration = decoded.exp
-        const now = Date.now() / 1000
-
-        if (tokenExpiration && tokenExpiration < now) {
-            await refreshToken()
-        } else {
-            setIsAuthorized(true)
         }
     }
 
