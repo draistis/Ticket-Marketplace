@@ -87,7 +87,7 @@ class Reservation(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     tickets = models.ManyToManyField(Ticket)
     reserved_at = models.DateTimeField(auto_now_add=True)
-    expires_at = models.DateTimeField()
+    expires_at = models.DateTimeField(default=None, null=False)
     is_finalized = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
