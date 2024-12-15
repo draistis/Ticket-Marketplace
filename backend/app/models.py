@@ -1,7 +1,8 @@
+from datetime import timedelta
 from django.db import models
-from django.core.validators import RegexValidator
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from .managers import UserManager
+from django.utils.timezone import now
 
 
 class User(AbstractBaseUser, PermissionsMixin):
@@ -19,7 +20,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     objects = UserManager()
 
     def __str__(self):
-        return self.name + ' - ' + self.email
+        return f"User {self.name} with email {self.email}"
 
 class Organizer(models.Model):
     name = models.CharField(max_length=255)
@@ -33,7 +34,7 @@ class Organizer(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.name + ' - ' + self.manager
+        return f"Organizer {self.name} by {self.manager}"
 
 class Location(models.Model):
     name = models.CharField(max_length=255)
@@ -44,7 +45,7 @@ class Location(models.Model):
     description = models.TextField(null=True, blank=True)
 
     def __str__(self):
-        return self.name + ' - ' + self.city + ', ' + self.country
+        return f"Location {self.name} in {self.city}, {self.country}"
 
 class EventCategories(models.TextChoices):
     MUSIC = 'MUSIC', 'Music'
@@ -67,36 +68,35 @@ class Event(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.name + ' - ' + self.start_datetime + ' - ' + self.location
+        return f"Event {self.name} by {self.organizer} at {self.location}"
 
-class Reservation(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    event = models.ForeignKey(Event, on_delete=models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True)
-    valid_for = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return self.user + ' - ' + self.event + ' - ' + self.created_at
-
-class Tickets(models.Model):
+class Ticket(models.Model):
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    owner = models.ForeignKey(User, on_delete=models.CASCADE, null=True, default=None)
+    owner = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, default=None)
     sector = models.CharField(max_length=50)
     row = models.CharField(max_length=10)
     seat = models.IntegerField()
-    available = models.BooleanField(default=True)
-    purchased_at = models.DateTimeField(default=None, null=True)
+    is_reserved = models.BooleanField(default=False)
+    reserved_until = models.DateTimeField(null=True, blank=True, default=None)
 
     def __str__(self):
-        return self.event + ' - ' + self.owner + ' - ' + self.sector + ' - ' + self.row + ' - ' + self.seat
+        return f"Ticket for {self.event} in sector {self.sector}, row {self.row}, seat {self.seat}"
 
-class ReservationTicket(models.Model):
-    reservation = models.ForeignKey(Reservation, on_delete=models.CASCADE)
-    ticket = models.ForeignKey(Tickets, on_delete=models.CASCADE)
+class Reservation(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    tickets = models.ManyToManyField(Ticket)
+    reserved_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+    is_finalized = models.BooleanField(default=False)
+
+    def save(self, *args, **kwargs):
+        if not self.expires_at:
+            self.expires_at = now() + timedelta(minutes=10)
+        super().save(*args, **kwargs)
 
     def __str__(self):
-        return self.reservation + ' - ' + self.ticket
+        return f"Reservation for tickets {self.tickets} by {self.user}"
 
 class Payment(models.Model):
     reservation = models.ForeignKey(Reservation, on_delete=models.RESTRICT)
@@ -105,7 +105,7 @@ class Payment(models.Model):
     payment_date = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.reservation + ' - ' + self.total + ' - ' + self.payment_date
+        return f"Payment for reservation {self.reservation} with total {self.total}"
 
 class Coupon(models.Model):
     code = models.CharField(max_length=50)
@@ -114,4 +114,4 @@ class Coupon(models.Model):
     activation_date = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.code + ' - ' + self.discount
+        return f"Coupon {self.code} with discount {self.discount} until {self.expiration_date}"
