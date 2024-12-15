@@ -46,15 +46,10 @@ class CouponSerializer(serializers.ModelSerializer):
 
 class TicketsSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Tickets
+        model = Ticket
         fields = '__all__'
 
 class PaymentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Payment
-        fields = '__all__'
-
-class ReservationTicketSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ReservationTicket
         fields = '__all__'

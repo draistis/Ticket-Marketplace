@@ -6,6 +6,7 @@ process.docx
 xxx.txt
 ~$rocess.docx
 backend/.env
+frontend/.env
 schema.png
 
 # Logs
@@ -32,3 +33,4 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
