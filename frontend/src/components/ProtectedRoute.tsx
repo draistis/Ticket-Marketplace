@@ -6,7 +6,7 @@ import { useEffect, useState } from "react"
 import { ReactNode } from "react";
 
 function ProtectedRoute({ children }: { children: ReactNode }) {
-    const [isAuthorizer, setIsAuthorized] = useState<boolean | null>(null)
+    const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null)
     
     useEffect(() => {
         const auth = async () => {
@@ -45,11 +45,11 @@ function ProtectedRoute({ children }: { children: ReactNode }) {
         }
     }
 
-    if (isAuthorizer === null) {
+    if (isAuthorized === null) {
         return <div>Loading...</div>
     }
 
-    return isAuthorizer ? children : <Navigate to="/login" />
+    return isAuthorized ? children : <Navigate to="/login" />
 }
 
 export default ProtectedRoute

@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import EventCard from "../components/Event";
-//import events from "../testData/event_data";
 import api from "../api";
 import { Event, Location, EventWithLocation } from "../props/Props";
 

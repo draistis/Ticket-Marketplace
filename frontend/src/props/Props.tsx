@@ -7,6 +7,7 @@ interface Event {
   start_datetime: string;
   location: number;
   organizer: number;
+  created_at: string;
 }
 interface Location {
   id: number;
@@ -24,4 +25,16 @@ interface EventWithLocation extends Event {
   venue: string;
 }
 
-export type { Event, Location, EventWithLocation };
+interface Ticket {
+  id: number;
+  sector: string;
+  row: string;
+  seat: number;
+  price: number;
+  event: number;
+  owner: number;
+  is_reserved: boolean;
+  reserved_until: string;
+}
+
+export type { Event, Location, EventWithLocation, Ticket };
