@@ -1,7 +1,15 @@
 import { useNavigate } from "react-router-dom";
-import { EventProps } from "../props/EventProps";
+import { EventWithLocation } from "../props/Props";
 
-const EventCard = ({ id, name, category, start_datetime, location }: EventProps) => {
+const EventCard = ({
+  id,
+  name,
+  category,
+  start_datetime,
+  city,
+  country,
+  venue,
+}: EventWithLocation) => {
   const eventDate = new Date(start_datetime);
   const formattedDate = eventDate.toLocaleDateString("en-US", {
     day: "2-digit",
@@ -38,7 +46,7 @@ const EventCard = ({ id, name, category, start_datetime, location }: EventProps)
         </div>
         <div className="text-lg font-bold text-gray-800 mt-1">{name}</div>
         <div className="text-sm text-gray-600 mt-1">
-          {location.city}, {location.country} • {location.venue}
+          {city}, {country} • {venue}
         </div>
       </div>
 

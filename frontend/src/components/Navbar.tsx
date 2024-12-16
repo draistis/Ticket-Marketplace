@@ -5,7 +5,7 @@ const Navbar: React.FC = () => {
     <nav className="bg-white shadow-md border-b">
       <div className="container mx-auto flex items-center justify-between px-4 py-3">
         <div className="flex items-center space-x-12">
-          <a href="#" className="text-purple-600 font-bold text-xl">
+          <a href="/" className="text-purple-600 font-bold text-xl">
             Tickets
           </a>
 
@@ -33,7 +33,7 @@ const Navbar: React.FC = () => {
 
         <div>
           <a
-            href="#login"
+            href="/login"
             className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition"
           >
             Login
