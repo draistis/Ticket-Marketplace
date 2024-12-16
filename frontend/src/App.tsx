@@ -3,7 +3,7 @@ import Login from "./pages/Login";
 import Home from "./pages/Home";
 import Register from "./pages/Register";
 import NotFound from "./pages/NotFound";
-import Layout from "./layout";
+import Layout from "./Layout";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 function LogOut() {

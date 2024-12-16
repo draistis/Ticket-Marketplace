@@ -4,43 +4,33 @@ const Navbar: React.FC = () => {
   return (
     <nav className="bg-white shadow-md border-b">
       <div className="container mx-auto flex items-center justify-between px-4 py-3">
-        {/* Left Side - Logo and Links */}
         <div className="flex items-center space-x-12">
-          {/* Logo */}
           <a href="#" className="text-purple-600 font-bold text-xl">
-            MyBrand
+            Tickets
           </a>
 
-          {/* Navigation Links */}
           <div className="flex space-x-8">
             <a
               href="#"
               className="text-gray-600 hover:text-purple-600 border-b-2 border-transparent hover:border-purple-600 transition"
             >
-              Dashboard
+              Concerts
             </a>
             <a
               href="#"
               className="text-gray-600 hover:text-purple-600 border-b-2 border-transparent hover:border-purple-600 transition"
             >
-              Team
+              Sports
             </a>
             <a
               href="#"
               className="text-gray-600 hover:text-purple-600 border-b-2 border-transparent hover:border-purple-600 transition"
             >
-              Projects
-            </a>
-            <a
-              href="#"
-              className="text-gray-600 hover:text-purple-600 border-b-2 border-transparent hover:border-purple-600 transition"
-            >
-              Calendar
+              Tech
             </a>
           </div>
         </div>
 
-        {/* Right Side - Login Button */}
         <div>
           <a
             href="#login"

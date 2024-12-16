@@ -8,6 +8,7 @@ xxx.txt
 backend/.env
 frontend/.env
 schema.png
+frontend/src/testData
 
 # Logs
 logs
@@ -34,4 +35,5 @@ dist-ssr
 *.sln
 *.sw?
 *.prettier*
+
 

@@ -2,7 +2,6 @@ import { useState } from "react";
 import api from "../api";
 import { ACCESS_TOKEN, REFRESH_TOKEN } from "../constants";
 import { useNavigate } from "react-router-dom";
-import "../styles/Form.css";
 
 interface FormProps {
   route: string;
@@ -41,13 +40,9 @@ function Form({ route, method }: FormProps) {
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md"
-    >
+    <form onSubmit={handleSubmit} className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md">
       <h1 className="text-2xl font-semibold text-center mb-6">{method}</h1>
 
-      {/* Name field (only for Register method) */}
       {method === "Register" && (
         <input
           className="w-full p-3 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
@@ -58,7 +53,6 @@ function Form({ route, method }: FormProps) {
         />
       )}
 
-      {/* Email field */}
       <input
         className="w-full p-3 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
         type="email"
@@ -67,7 +61,6 @@ function Form({ route, method }: FormProps) {
         onChange={(e) => setEmail(e.target.value)}
       />
 
-      {/* Password field */}
       <input
         className="w-full p-3 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
         type="password"
@@ -76,7 +69,6 @@ function Form({ route, method }: FormProps) {
         onChange={(e) => setPassword(e.target.value)}
       />
 
-      {/* Confirm Password field (only for Register method) */}
       {method === "Register" && (
         <input
           className="w-full p-3 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
@@ -87,7 +79,6 @@ function Form({ route, method }: FormProps) {
         />
       )}
 
-      {/* Submit Button */}
       <button
         type="submit"
         className="w-full p-3 mt-4 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500"
