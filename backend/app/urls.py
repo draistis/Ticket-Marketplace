@@ -10,4 +10,6 @@ urlpatterns = [
     path('location/<int:pk>/', views.LocationDetail, name='location-detail'),
     path('event/', views.EventList, name='event-list'),
     path('event/<int:pk>/', views.EventDetail, name='event-detail'),
+    path('event/<int:pk>/tickets/', views.EventTickets, name='event-tickets'),
+    path('ticket/', views.TicketList, name='ticket-list'),
 ]

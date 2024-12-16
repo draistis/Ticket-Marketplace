@@ -145,3 +145,31 @@ def EventDetail(request, pk):
         event.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+# api/event/<int:pk>/tickets/
+@api_view(['GET'])
+@permission_classes([permissions.AllowAny])
+def EventTickets(request, pk):
+    try:
+        event = Event.objects.get(pk=pk)
+    except Event.DoesNotExist:
+        return Response({"error": "Event not found"}, status=status.HTTP_404_NOT_FOUND)
+    
+    tickets = Ticket.objects.filter(event=event, is_reserved=False)
+    serializer = TicketSerializer(tickets, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+# api/ticket/
+@api_view(['POST', 'GET'])
+@permission_classes([IsSuperUser])
+def TicketList(request):
+    if request.method == 'POST':
+        serializer = TicketSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+    
+    elif request.method == 'GET':
+        tickets = Ticket.objects.all()
+        serializer = TicketSerializer(tickets, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)

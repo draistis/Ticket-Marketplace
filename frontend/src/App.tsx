@@ -5,6 +5,7 @@ import Register from "./pages/Register";
 import NotFound from "./pages/NotFound";
 import Layout from "./Layout";
 import ProtectedRoute from "./components/ProtectedRoute";
+import EventDetailsPage from "./pages/EventDetails";
 
 function LogOut() {
   localStorage.clear();
@@ -25,6 +26,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<RegisterAndLogout />} />
           <Route path="/logout" element={<LogOut />} />
+          <Route path="/event/:id" element={<EventDetailsPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Layout>

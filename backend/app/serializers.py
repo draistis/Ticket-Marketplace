@@ -44,7 +44,7 @@ class CouponSerializer(serializers.ModelSerializer):
         model = Coupon
         fields = '__all__'
 
-class TicketsSerializer(serializers.ModelSerializer):
+class TicketSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ticket
         fields = '__all__'

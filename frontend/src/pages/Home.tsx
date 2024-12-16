@@ -5,7 +5,6 @@ import { Event, Location, EventWithLocation } from "../props/Props";
 
 const Home: React.FC = () => {
   const [events, setEvents] = useState<EventWithLocation[]>([]);
-  const [locations, setLocations] = useState<Location[]>([]);
 
   useEffect(() => {
     getEvents();

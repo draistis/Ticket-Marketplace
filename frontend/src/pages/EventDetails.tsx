@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import api from "../api";
 import { Location, Event, Ticket } from "../props/Props";
 import { useParams } from "react-router-dom";
@@ -10,10 +10,10 @@ const EventDetailsPage: React.FC = () => {
   const [location, setLocation] = React.useState<Location | null>(null);
   const [loading, setLoading] = React.useState(false);
 
-  React.useEffect(() => {
+  useEffect(() => {
     getEventDetails();
     getTickets();
-  });
+  }, []);
 
   async function getEventDetails() {
     try {
@@ -29,7 +29,7 @@ const EventDetailsPage: React.FC = () => {
   async function getTickets() {
     try {
       setLoading(true);
-      const ticketRes = await api.get(`api/ticket/?event=${id}`);
+      const ticketRes = await api.get(`api/event/${id}/tickets/`);
       setTickets(ticketRes.data);
     } catch (error) {
       alert("Failed to fetch tickets. Please try again.");
