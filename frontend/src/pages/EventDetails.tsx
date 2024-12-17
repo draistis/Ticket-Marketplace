@@ -10,11 +10,13 @@ const EventDetailsPage: React.FC = () => {
   const [tickets, setTickets] = React.useState<Ticket[]>([]);
   const [location, setLocation] = React.useState<Location | null>(null);
   const [loading, setLoading] = React.useState(false);
+  const [reservedTickets, setReservedTickets] = React.useState<Ticket[]>([]);
   const { isAuthenticated } = React.useContext(AuthContext);
 
   useEffect(() => {
     getEventDetails();
     getTickets();
+    getReservedTickets();
   }, []);
 
   async function getEventDetails() {
@@ -40,6 +42,41 @@ const EventDetailsPage: React.FC = () => {
       setLoading(false);
     }
   }
+  async function getReservedTickets() {
+    try {
+      const ticketRes = await api.get(`api/event/${id}/reservation/`);
+      setReservedTickets(ticketRes.data);
+    } catch (error) {
+      alert("Failed to fetch reserved tickets. Please try again.");
+      console.error(error);
+    }
+  }
+  async function handleTicketAdd(ticket_id: number) {
+    if (!isAuthenticated) {
+      alert("Please login to buy tickets.");
+      return;
+    } else {
+      const response = await api.post(`api/ticket/${ticket_id}/reserve/`);
+      if (response.status === 200) {
+        getReservedTickets();
+        getTickets();
+      } else {
+        alert(response.data);
+      }
+    }
+  }
+  async function removeTicket(ticket_id: number) {
+    const response = await api.delete(`api/ticket/${ticket_id}/reserve/`);
+    if (response.status === 200) {
+      getReservedTickets();
+      getTickets();
+    } else {
+      alert(response.data);
+    }
+  }
+  async function handleCheckout() {
+    return
+  }
 
   return (
     <div className="container mx-auto px-4 py-8 flex gap-8">
@@ -62,6 +99,45 @@ const EventDetailsPage: React.FC = () => {
                 {location?.name}, {location?.city}, {location?.country}
               </p>
             </div>
+
+            {reservedTickets.length > 0 ? (
+              <>
+                <hr className="my-6 h-0.5 border-t-0 bg-purple-700 opacity-100 dark:opacity-50" />
+                <div className="bg-white p-6 rounded-lg shadow-md h-min mt-4">
+                  <h2 className="text-2xl font-semibold mb-4">Your Reserved Tickets</h2>
+                  <ul>
+                    {reservedTickets.map((ticket) => (
+                      <li
+                        key={ticket.id}
+                        className="flex justify-between p-4 mb-2 border rounded-md shadow-sm"
+                      >
+                        <div>
+                          <p className="text-gray-800">
+                            Sector: {ticket.sector}, Row: {ticket.row}, Seat: {ticket.seat}
+                          </p>
+                          <p className="text-gray-600">Price: ${ticket.price}</p>
+                        </div>
+                        <p className="text-green-600 font-semibold">Reserved</p>
+                        <button
+                          onClick={() => removeTicket(ticket.id)}
+                          className="px-2 my-auto h-10 border-2 border-red-500 rounded-lg hover:bg-red-500 transition"
+                        >
+                          Remove
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                  <div className="flex justify-end">
+                    <button
+                      onClick={() => handleCheckout()}
+                      className="mt-4 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+                    >
+                      Checkout
+                    </button>
+                  </div>
+                </div>
+              </>
+            ) : null}
           </>
         ) : (
           <p>Loading event details...</p>
@@ -83,7 +159,10 @@ const EventDetailsPage: React.FC = () => {
                   </p>
                   <p className="text-gray-600">Price: ${ticket.price}</p>
                 </div>
-                <button className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700">
+                <button
+                  onClick={() => handleTicketAdd(ticket.id)}
+                  className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700"
+                >
                   Buy Ticket
                 </button>
               </li>

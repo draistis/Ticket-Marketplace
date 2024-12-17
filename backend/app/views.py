@@ -256,32 +256,72 @@ def TicketList(request):
         return Response(serializer.data, status=status.HTTP_200_OK)
     
 # api/ticket/<int:pk>/reserve/
-@api_view(['POST'])
+@api_view(['POST', 'GET', 'DELETE'])
 @permission_classes([permissions.IsAuthenticated])
 def TicketReserve(request, pk):
+    if request.method == 'POST':
+        try:
+            ticket = Ticket.objects.get(pk=pk)
+        except Ticket.DoesNotExist:
+            return Response({"error": "Ticket not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+        if ticket.is_reserved:
+            return Response({"error": "Ticket is already reserved"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        reservation = Reservation.objects.filter(user=request.user, is_finalized=False).first()
+        if reservation:
+            if reservation.tickets.count() > 4:
+                return Response({"error": "Reservation limit exceeded"}, status=status.HTTP_400_BAD_REQUEST)
+            reservation.tickets.add(ticket)
+            ticket.is_reserved = True
+            ticket.save()
+        else:
+            reservation = Reservation(user=request.user)
+            reservation.save()
+            reservation.tickets.add(ticket)
+            ticket.is_reserved = True
+            ticket.save()
+        
+        return Response({"message": "Ticket reserved successfully"}, status=status.HTTP_200_OK)
+    if request.method == 'GET':
+        try:
+            ticket = Ticket.objects.get(pk=pk)
+        except Ticket.DoesNotExist:
+            return Response({"error": "Ticket not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+        serializer = TicketSerializer(ticket)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    if request.method == 'DELETE':
+        try:
+            ticket = Ticket.objects.get(pk=pk)
+        except Ticket.DoesNotExist:
+            return Response({"error": "Ticket not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+        reservation = Reservation.objects.filter(user=request.user, is_finalized=False).first()
+        if reservation and ticket in reservation.tickets.all():
+            reservation.tickets.remove(ticket)
+            ticket.is_reserved = False
+            ticket.save()
+            return Response({"message": "Ticket removed from reservation"}, status=status.HTTP_200_OK)
+        return Response({"error": "Ticket not found in reservation"}, status=status.HTTP_404_NOT_FOUND)
+
+# api/event/<int:pk>/reservation/
+@api_view(['GET'])
+@permission_classes([permissions.IsAuthenticated])
+def EventReservation(request, pk):
     try:
-        ticket = Ticket.objects.get(pk=pk)
-    except Ticket.DoesNotExist:
-        return Response({"error": "Ticket not found"}, status=status.HTTP_404_NOT_FOUND)
+        event = Event.objects.get(pk=pk)
+    except Event.DoesNotExist:
+        return Response({"error": "Event not found"}, status=status.HTTP_404_NOT_FOUND)
     
-    if ticket.is_reserved:
-        return Response({"error": "Ticket is already reserved"}, status=status.HTTP_400_BAD_REQUEST)
-    
-    reservation = Reservation.objects.filter(user=request.user, is_finalized=False).first()
-    if reservation:
-        reservation.tickets.add(ticket)
-        ticket.is_reserved = True
-        ticket.save()
-    else:
-        reservation = Reservation(user=request.user)
-        reservation.save()
-        reservation.tickets.add(ticket)
-        ticket.is_reserved = True
-        ticket.save()
-    
-    return Response({"message": "Ticket reserved successfully"}, status=status.HTTP_200_OK)
+    reservations = Reservation.objects.filter(tickets__event=event, is_finalized=False)
+    for reservation in reservations:
+        reservation.release()
 
-
+    reservation = Reservation.objects.filter(tickets__event=event, is_finalized=False, user=request.user)
+    tickets = Ticket.objects.filter(id__in=reservation.values_list('tickets', flat=True))
+    serializer = TicketSerializer(tickets, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 
