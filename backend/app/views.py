@@ -5,11 +5,74 @@ from rest_framework.response import Response
 from .models import *
 from .serializers import *
 from .permissions import *
-from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework.views import APIView
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
 
 
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
+    def post(self, request, *args, **kwargs):
+        response = super().post(request, *args, **kwargs)
+        if(response.status_code == 200):
+            access_token = response.data.get('access')
+            refresh_token = response.data.get('refresh')
+
+            response.set_cookie(
+                'access',
+                access_token,
+                httponly=True,
+                path='/',
+                secure=True,
+                samesite='None'
+            )
+            response.set_cookie(
+                'refresh',
+                refresh_token,
+                httponly=True,
+                path='/',
+                secure=True,
+                samesite='None'
+            )
+
+        return response
+
+class CustomTokenRefreshView(TokenRefreshView):
+    def post(self, request, *args, **kwargs):
+        refresh_token = request.COOKIES.get('refresh')
+        if(refresh_token):
+            request.data['refresh'] = refresh_token
+
+        response = super().post(request, *args, **kwargs)
+
+        if(response.status_code == 200):
+            access_token = response.data.get('access')
+
+            response.set_cookie(
+                'access',
+                access_token,
+                httponly=True,
+                path='/',
+                secure=True,
+                samesite='None'
+            )
+
+        return response
+    
+class CustomTokenVerifyView(TokenVerifyView):
+    def post(self, request, *args, **kwargs):
+        access_token = request.COOKIES.get('access')
+        if(access_token):
+            request.data['token'] = access_token
+
+        return super().post(request, *args, **kwargs)
+    
+class LogoutView(APIView):
+    def post(self, request):
+        response = Response(status=status.HTTP_204_NO_CONTENT)
+        response.delete_cookie('access')
+        response.delete_cookie('refresh')
+
+        return response
 
 @api_view(['POST'])
 @permission_classes([permissions.AllowAny])
@@ -173,3 +236,10 @@ def TicketList(request):
         tickets = Ticket.objects.all()
         serializer = TicketSerializer(tickets, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+
+# test
+@api_view(['GET'])
+@permission_classes([permissions.IsAuthenticated])
+def test(request):
+    return Response({"message": "Hello, World!"}, status=status.HTTP_200_OK)

@@ -26,7 +26,14 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<RegisterAndLogout />} />
           <Route path="/logout" element={<LogOut />} />
-          <Route path="/event/:id" element={<EventDetailsPage />} />
+          <Route
+            path="/event/:id"
+            element={
+              <ProtectedRoute>
+                <EventDetailsPage />
+              </ProtectedRoute>
+            }
+          />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Layout>

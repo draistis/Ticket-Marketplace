@@ -1,4 +1,5 @@
 import React from "react";
+import { ACCESS_TOKEN } from "../constants";
 
 const Navbar: React.FC = () => {
   return (
@@ -32,12 +33,21 @@ const Navbar: React.FC = () => {
         </div>
 
         <div>
-          <a
-            href="/login"
-            className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition"
-          >
-            Login
-          </a>
+          {localStorage.getItem(ACCESS_TOKEN) ? (
+            <a
+              href="/logout"
+              className="px-4 py-2 border-purple-600 border-solid border-2 rounded hover:bg-purple-700 hover:text-white transition"
+            >
+              Logout
+            </a>
+          ) : (
+            <a
+              href="/login"
+              className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition"
+            >
+              Login
+            </a>
+          )}
         </div>
       </div>
     </nav>

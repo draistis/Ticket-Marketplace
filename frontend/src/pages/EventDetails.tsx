@@ -41,24 +41,32 @@ const EventDetailsPage: React.FC = () => {
 
   return (
     <div className="container mx-auto px-4 py-8 flex gap-8">
-      <div className="w-2/5 bg-white p-6 rounded-lg shadow-md">
+      <div className="w-3/5">
         {eventDetails ? (
           <>
-            <h1 className="text-3xl font-bold mb-4">{eventDetails.name}</h1>
-            <p className="text-gray-700 mb-2">{eventDetails.description}</p>
-            <p className="text-gray-600">
-              {location?.name}, {location?.city}, {location?.country}
-            </p>
-            <p className="text-gray-600">
-              {new Date(eventDetails.start_datetime).toLocaleString()}
-            </p>
+            <div className="bg-white p-6 rounded-lg shadow-md h-min">
+              <h1 className="text-3xl font-bold mb-4">{eventDetails.name}</h1>
+              <p className="text-gray-700 mb-2">{eventDetails.description}</p>
+            </div>
+            <div className="bg-white p-6 rounded-lg shadow-md h-min mt-4">
+              <h2 className="text-2xl font-semibold mb-4">Date & Time</h2>
+              <p className="text-gray-600">
+                {new Date(eventDetails.start_datetime).toLocaleString()}
+              </p>
+            </div>
+            <div className="bg-white p-6 rounded-lg shadow-md h-min mt-4">
+              <h2 className="text-2xl font-semibold mb-4">Location</h2>
+              <p className="text-gray-600">
+                {location?.name}, {location?.city}, {location?.country}
+              </p>
+            </div>
           </>
         ) : (
           <p>Loading event details...</p>
         )}
       </div>
 
-      <div className="w-3/5 bg-white p-6 rounded-lg shadow-md">
+      <div className="w-2/5 bg-white p-6 rounded-lg shadow-md">
         <h2 className="text-2xl font-semibold mb-4">Available Tickets</h2>
         {tickets.length > 0 ? (
           <ul>
