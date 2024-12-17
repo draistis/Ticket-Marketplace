@@ -78,10 +78,6 @@ class Ticket(models.Model):
     row = models.CharField(max_length=10)
     seat = models.IntegerField()
     is_reserved = models.BooleanField(default=False)
-    reserved_until = models.DateTimeField(null=True, blank=True, default=None)
-
-    def __str__(self):
-        return f"Ticket for {self.event} in sector {self.sector}, row {self.row}, seat {self.seat}"
 
 class Reservation(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -90,13 +86,17 @@ class Reservation(models.Model):
     expires_at = models.DateTimeField(default=None, null=False)
     is_finalized = models.BooleanField(default=False)
 
+    def release(self):
+        if self.expires_at < now():
+            for ticket in self.tickets.all():
+                ticket.is_reserved = False
+                ticket.save()
+            self.delete()
+
     def save(self, *args, **kwargs):
         if not self.expires_at:
             self.expires_at = now() + timedelta(minutes=10)
         super().save(*args, **kwargs)
-
-    def __str__(self):
-        return f"Reservation for tickets {self.tickets} by {self.user}"
 
 class Payment(models.Model):
     reservation = models.ForeignKey(Reservation, on_delete=models.RESTRICT)

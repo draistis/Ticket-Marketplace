@@ -16,6 +16,7 @@ urlpatterns = [
     path('event/<int:pk>/', views.EventDetail, name='event-detail'),
     path('event/<int:pk>/tickets/', views.EventTickets, name='event-tickets'),
     path('ticket/', views.TicketList, name='ticket-list'),
+    path('ticket/<int:pk>/reserve/', views.TicketReserve, name='ticket-reserve'),
 
     path('test/', views.test, name='test'),
 ]
