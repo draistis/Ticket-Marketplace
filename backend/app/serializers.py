@@ -9,6 +9,9 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         data = super().validate(attrs)
         data['is_superuser'] = self.user.is_superuser
         data['is_organizer'] = self.user.is_organizer
+        data['email'] = self.user.email
+        data['name'] = self.user.name
+        data['id'] = self.user.id
         return data
 
 class UserSerializer(serializers.ModelSerializer):

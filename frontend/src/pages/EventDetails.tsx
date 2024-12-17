@@ -1,7 +1,8 @@
 import React, { useEffect } from "react";
 import api from "../api";
-import { Location, Event, Ticket } from "../props/Props";
+import { Location, Event, Ticket } from "../types/Props";
 import { useParams } from "react-router-dom";
+import { AuthContext } from "../context/AuthContext";
 
 const EventDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -9,6 +10,7 @@ const EventDetailsPage: React.FC = () => {
   const [tickets, setTickets] = React.useState<Ticket[]>([]);
   const [location, setLocation] = React.useState<Location | null>(null);
   const [loading, setLoading] = React.useState(false);
+  const { isAuthenticated } = React.useContext(AuthContext);
 
   useEffect(() => {
     getEventDetails();

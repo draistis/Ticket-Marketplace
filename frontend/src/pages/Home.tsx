@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import EventCard from "../components/Event";
 import api from "../api";
-import { Event, Location, EventWithLocation } from "../props/Props";
+import { Event, Location, EventWithLocation } from "../types/Props";
 
 const Home: React.FC = () => {
   const [events, setEvents] = useState<EventWithLocation[]>([]);

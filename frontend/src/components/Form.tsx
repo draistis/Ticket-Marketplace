@@ -1,7 +1,8 @@
 import { useState } from "react";
 import api from "../api";
-import { ACCESS_TOKEN, REFRESH_TOKEN } from "../constants";
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../context/AuthContext";
+import React from "react";
 
 interface FormProps {
   route: string;
@@ -9,6 +10,7 @@ interface FormProps {
 }
 
 function Form({ route, method }: FormProps) {
+  const { login } = React.useContext(AuthContext);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
@@ -20,21 +22,32 @@ function Form({ route, method }: FormProps) {
     setLoading(true);
     e.preventDefault();
     try {
-      if (method === "Register" && password !== confirmPassword) {
-        alert("Passwords do not match");
-        return;
+      if (method === "Register") {
+        if (password !== confirmPassword) {
+          alert("Passwords do not match");
+          return;
+        }
+        const response = await api.post(route, { name, email, password });
+        if (response.status === 201) {
+          alert("Registration successful");
+          navigate("/login");
+        } else {
+          alert("Registration failed");
+        }
       }
-      const response = await api.post(route, { name, email, password });
-      if (method === "Login" && response.status === 200) {
-        localStorage.setItem(ACCESS_TOKEN, response.data.access);
-        localStorage.setItem(REFRESH_TOKEN, response.data.refresh);
-        navigate("/");
-      } else if (method === "Register" && response.status === 201) {
-        navigate("/login");
+      if (method === "Login") {
+        const success = await login(email, password);
+        if (success) {
+          alert("Login successful");
+          navigate("/");
+        } else {
+          alert("Login failed");
+        }
+        setLoading(false);
       }
     } catch (error) {
-      alert(error);
-    } finally {
+      alert("An error occurred. Please try again.");
+      console.error(error);
       setLoading(false);
     }
   };

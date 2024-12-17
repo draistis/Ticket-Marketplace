@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { EventWithLocation } from "../props/Props";
+import { EventWithLocation } from "../types/Props";
 
 const EventCard = ({
   id,

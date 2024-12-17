@@ -1,7 +1,9 @@
 import React from "react";
-import { ACCESS_TOKEN } from "../constants";
+import { AuthContext } from "../context/AuthContext";
 
 const Navbar: React.FC = () => {
+  const { isAuthenticated, logout } = React.useContext(AuthContext);
+
   return (
     <nav className="bg-white shadow-md border-b">
       <div className="container mx-auto flex items-center justify-between px-4 py-3">
@@ -33,13 +35,13 @@ const Navbar: React.FC = () => {
         </div>
 
         <div>
-          {localStorage.getItem(ACCESS_TOKEN) ? (
-            <a
-              href="/logout"
+          {isAuthenticated ? (
+            <button
+              onClick={logout}
               className="px-4 py-2 border-purple-600 border-solid border-2 rounded hover:bg-purple-700 hover:text-white transition"
             >
               Logout
-            </a>
+            </button>
           ) : (
             <a
               href="/login"
