@@ -3,6 +3,7 @@ import jwt
 from rest_framework import status, permissions
 from rest_framework.decorators import permission_classes, api_view
 from rest_framework.response import Response
+import stripe
 
 from ticketing_system import settings
 from .models import *
@@ -340,6 +341,44 @@ def EventReservation(request, pk):
     serializer = TicketSerializer(tickets, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
+@api_view(['POST'])
+@permission_classes([permissions.IsAuthenticated])
+def PaymentCreate(request):
+    stripe.api_key = settings.STRIPE_SECRET_KEY
+    try:
+        reservation = Reservation.objects.get(user=request.user, is_finalized=False)
+        if Reservation.objects.filter(user=request.user, is_finalized=False).count() == 0:
+            return Response({"error": "No active reservation found"}, status=status.HTTP_404_NOT_FOUND)
+        else:
+            reservation.is_finalized = True
+            reservation.save()
+        tickets = reservation.tickets.all()
+        #total = sum(tickets.values_list('price', flat=True))
+        checkout_session = stripe.checkout.Session.create(
+            payment_method_types=['card'],
+            line_items = [
+                {
+                    "price_data": {
+                        "currency": "usd",
+                        "product_data": {
+                            "name": ticket.event.name,
+                            "description": f"Row {ticket.row}, Seat {ticket.seat}",
+                        },
+                        "unit_amount": int(ticket.price * 100),
+                    },
+                    "quantity": 1,
+                }
+                for ticket in tickets
+            ],
+            mode='payment',
+            success_url='http://localhost:5173/success',
+            cancel_url='http://localhost:5173/cancel',
+        )
+        return Response({"id": checkout_session.id}, status=status.HTTP_200_OK)
+    except Exception as e:
+        reservation.is_finalized = False
+        reservation.save()
+        return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 

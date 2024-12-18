@@ -161,3 +161,6 @@ CORS_ALLOWED_ORIGINS = getenv('CORS_ALLOWED_ORIGINS', 'http://localhost:5173,htt
 CORS_ALLOW_CREDENTIALS = True
 CSRF_COOKIE_SECURE = False  # True in production (HTTPS)
 SESSION_COOKIE_SECURE = False  # True in production (HTTPS)
+
+
+STRIPE_SECRET_KEY = getenv('STRIPE_SECRET_KEY')

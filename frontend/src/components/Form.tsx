@@ -38,7 +38,6 @@ function Form({ route, method }: FormProps) {
       if (method === "Login") {
         const success = await login(email, password);
         if (success) {
-          alert("Login successful");
           navigate("/");
         } else {
           alert("Login failed");

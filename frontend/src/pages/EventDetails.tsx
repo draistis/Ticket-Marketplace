@@ -3,6 +3,7 @@ import api from "../api";
 import { Location, Event, Ticket } from "../types/Props";
 import { useParams } from "react-router-dom";
 import { AuthContext } from "../context/Auth";
+import { loadStripe } from "@stripe/stripe-js";
 
 const EventDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -72,9 +73,25 @@ const EventDetailsPage: React.FC = () => {
       alert(response.data);
     }
   }
-  async function handleCheckout() {
-    return
-  }
+  const stripePromise = loadStripe("pk_test_51QXTrFLfoKR0enAtd21ULGubuHawevmSymJmVELOZyz7zr8UhxEDRW9Mt5FcRrRwzCMqj82QhkmBzO2xBkjMrNCx00PjS8YqCm");
+
+  const handleCheckout = async () => {
+    try {
+      const response = await api.post("api/payment/create/");
+      const session = response.data;
+      const stripe = await stripePromise;
+
+      const result = await stripe?.redirectToCheckout({
+        sessionId: session.id,
+      });
+
+      if (result?.error) {
+        console.error(result.error.message);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <div className="container mx-auto px-4 py-8 flex gap-8">

@@ -19,5 +19,7 @@ urlpatterns = [
     path('ticket/<int:pk>/reserve/', views.TicketReserve, name='ticket-reserve'),
     path('event/<int:pk>/reservation/', views.EventReservation, name='event-reservation'),
 
+    path('payment/create/', views.PaymentCreate, name='payment-create'),
+
     path('test/', views.test, name='test'),
 ]
