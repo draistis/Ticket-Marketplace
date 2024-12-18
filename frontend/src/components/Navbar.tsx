@@ -1,8 +1,8 @@
 import React from "react";
-import { AuthContext } from "../context/AuthContext";
+import { AuthContext } from "../context/Auth";
 
 const Navbar: React.FC = () => {
-  const { isAuthenticated, logout } = React.useContext(AuthContext);
+  const { isAuthenticated, user, logout } = React.useContext(AuthContext);
 
   return (
     <nav className="bg-white shadow-md border-b">
@@ -31,6 +31,14 @@ const Navbar: React.FC = () => {
             >
               Tech
             </a>
+            { user?.is_organizer && (
+              <a
+                href="/event/create"
+                className="text-gray-600 hover:text-purple-600 border-b-2 border-transparent hover:border-purple-600 transition"
+              >
+                Create Event
+              </a>
+            )}
           </div>
         </div>
 

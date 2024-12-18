@@ -1,7 +1,10 @@
 from django.http import JsonResponse
+import jwt
 from rest_framework import status, permissions
 from rest_framework.decorators import permission_classes, api_view
 from rest_framework.response import Response
+
+from ticketing_system import settings
 from .models import *
 from .serializers import *
 from .permissions import *
@@ -59,12 +62,26 @@ class CustomTokenRefreshView(TokenRefreshView):
         return response
     
 class CustomTokenVerifyView(TokenVerifyView):
+    #serializer_class = CustomTokenVerifySerializer
     def post(self, request, *args, **kwargs):
         access_token = request.COOKIES.get('access')
         if(access_token):
-            request.data['token'] = access_token
+            data = request.data.copy()
+            data['token'] = access_token
+            request._full_data = data
 
-        return super().post(request, *args, **kwargs)
+        #return super().post(request, *args, **kwargs)
+        response = super().post(request, *args, **kwargs)
+
+        if response.status_code == 200:
+            id = jwt.decode(access_token, settings.SECRET_KEY, algorithms=['HS256'])['user_id']
+            response.data['is_superuser'] = User.objects.get(id=id).is_superuser
+            response.data['is_organizer'] = User.objects.get(id=id).is_organizer
+            response.data['email'] = User.objects.get(id=id).email
+            response.data['name'] = User.objects.get(id=id).name
+            response.data['id'] = id
+
+        return response
     
 class LogoutView(APIView):
     def post(self, request):
@@ -162,7 +179,7 @@ def LocationDetail(request, pk):
     
 # api/event/
 @api_view(['POST', 'GET'])
-@permission_classes([IsSuperUserOrReadOnly])
+@permission_classes([IsOrganizerOrReadOnly])
 def EventList(request):
     if request.method == 'POST':
         serializer = EventSerializer(data=request.data)

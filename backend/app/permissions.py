@@ -16,7 +16,11 @@ class IsSuperUserOrReadOnly(BasePermission):
 
 class IsOrganizer(BasePermission):
     def has_permission(self, request, view):
-        return request.user and request.user.is_organizer
+        return request.user and (request.user.is_organizer or request.user.is_superuser)
+    
+class IsOrganizerOrReadOnly(BasePermission):
+    def has_permission(self, request, view):
+        return request.user and (request.user.is_organizer or request.user.is_superuser or request.method in SAFE_METHODS)
     
 class IsOwner(BasePermission):
     def has_object_permission(self, request, view, obj):

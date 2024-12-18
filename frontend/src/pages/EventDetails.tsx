@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import api from "../api";
 import { Location, Event, Ticket } from "../types/Props";
 import { useParams } from "react-router-dom";
-import { AuthContext } from "../context/AuthContext";
+import { AuthContext } from "../context/Auth";
 
 const EventDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();

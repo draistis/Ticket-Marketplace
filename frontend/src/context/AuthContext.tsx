@@ -1,26 +1,32 @@
-import React, { createContext, useState, useEffect, ReactNode } from "react";
+import React, { useState, useEffect, ReactNode } from "react";
 import api from "../api";
-import { User, AuthContextType } from "../types/AuthTypes";
-
-export const AuthContext = createContext<AuthContextType>({
-  isAuthenticated: false,
-  user: null,
-  logout: async () => {},
-  login: async () => false,
-});
+import { User } from "../types/AuthTypes";
+import { AuthContext } from "./Auth";
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
+    console.log(user);
+  }, [user]);
+
+  useEffect(() => {
+    setLoading(true);
     const checkAuthStatus = async () => {
       try {
         const response = await api.post("api/auth/verify/");
         if (response.status !== 200) {
           throw new Error("User not authenticated");
         } else {
-          setUser(null);
+          setUser({
+            id: response.data.id,
+            name: response.data.name,
+            email: response.data.email,
+            is_superuser: response.data.is_superuser,
+            is_organizer: response.data.is_organizer,
+          });
           setIsAuthenticated(true);
         }
       } catch (error) {
@@ -53,6 +59,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         id: response.data.id,
         name: response.data.name,
         email: response.data.email,
+        is_superuser: response.data.is_superuser,
+        is_organizer: response.data.is_organizer,
       });
       setIsAuthenticated(true);
       return true;
@@ -62,10 +70,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setIsAuthenticated(false);
       return false;
     }
+    setLoading(false);
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, user, logout, login }}>
+    <AuthContext.Provider value={{ isAuthenticated, user, logout, login, loading }}>
       {children}
     </AuthContext.Provider>
   );

@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth.hashers import make_password
 from .models import *
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer, TokenVerifySerializer
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -13,6 +13,8 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         data['name'] = self.user.name
         data['id'] = self.user.id
         return data
+    
+
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:

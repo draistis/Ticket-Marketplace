@@ -5,6 +5,7 @@ import Register from "./pages/Register";
 import NotFound from "./pages/NotFound";
 import Layout from "./Layout";
 import EventDetailsPage from "./pages/EventDetails";
+import CreateEvent from "./pages/CreateEvent";
 
 
 function App() {
@@ -16,6 +17,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/event/:id" element={<EventDetailsPage />} />
+          <Route path="/event/create" element={<CreateEvent />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Layout>
