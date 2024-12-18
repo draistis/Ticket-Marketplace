@@ -185,7 +185,7 @@ def EventList(request):
         if category:
             events = events.filter(category__icontains=category)
         if start_datetime:
-            events = events.filter(start_datetime >= start_datetime)
+            events = events.filter(start_datetime__gte=start_datetime)
         if city:
             events = events.filter(location__city__icontains=city)
         if country:

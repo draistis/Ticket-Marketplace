@@ -1,54 +1,98 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import EventCard from "../components/Event";
 import api from "../api";
 import { Event, Location, EventWithLocation } from "../types/Props";
+import SearchBar from "../components/eventSearchBar";
 
 const Home: React.FC = () => {
   const [events, setEvents] = useState<EventWithLocation[]>([]);
+  const [locations, setLocations] = useState<Location[]>([]);
+  const [filters, setFilters] = useState({
+    eventName: "",
+    location: "",
+    date: "",
+  });
 
   useEffect(() => {
-    getEvents();
+    getLocations();
+    getEvents(filters);
   }, []);
 
-  async function getEvents() {
+  const getEvents = useCallback(async (filters: { eventName: string; location: string; date: string }) => {
     try {
-      const [eventResponse, locationResponse] = await Promise.all([
-        api.get("api/event/"),
-        api.get("api/location/"),
-      ]);
+      const { eventName, location, date } = filters;
+      const queryParams: Record<string, string> = {};
+
+      if (eventName) queryParams.query = eventName;
+      if (date) queryParams.start_datetime = date;
+
+      const eventResponse = await api.get("api/event/", { params: queryParams });
       const eventData: Event[] = eventResponse.data;
-      const locationData: Location[] = locationResponse.data;
 
-      const locationMap: Record<number, Location> = {};
-      locationData.forEach((location) => {
-        locationMap[location.id] = location;
-      });
+      const eventsWithLocation: EventWithLocation[] = eventData
+        .map((event: Event) => {
+          const eventLocation = locations.find((location) => location.id === event.location);
+          return eventLocation
+            ? {
+                ...event,
+                city: eventLocation.city,
+                country: eventLocation.country,
+                venue: eventLocation.name,
+              }
+            : null;
+        })
+        .filter((event) => event !== null) as EventWithLocation[];
 
-      const eventsWithLocation = eventData.map((event: Event) => ({
-        ...event,
-        city: locationMap[event.location].city,
-        country: locationMap[event.location].country,
-        venue: locationMap[event.location].name,
-      }));
-
-      setEvents(eventsWithLocation);
+      if (location) {
+        const [city, country] = location.split(",").map((str) => str.trim());
+        setEvents(
+          eventsWithLocation.filter(
+            (event) =>
+              (city && event.city.toLowerCase().includes(city.toLowerCase())) ||
+              (country && event.country.toLowerCase().includes(country.toLowerCase())),
+          ),
+        );
+      } else {
+        setEvents(eventsWithLocation);
+      }
     } catch (error) {
-      alert("Failed to fetch events or locations. Please try again.");
+      console.error(error);
+    }
+  }, [locations]);
+
+  useEffect(() => {
+    getEvents(filters);
+  }, [filters, getEvents]);
+
+  async function getLocations() {
+    try {
+      const locationResponse = await api.get("api/location/");
+      setLocations(locationResponse.data);
+    } catch (error) {
       console.error(error);
     }
   }
 
+  const handleSearch = (filters: { eventName: string; location: string; date: string }) => {
+    setFilters(filters);
+  };
+
   return (
-    <div className="container mx-auto p-6">
-      <div className="max-w-screen-lg mx-auto">
-        <h1 className="text-2xl font-bold text-gray-800 mb-6">Upcoming Events</h1>
-        <div className="bg-white border rounded-lg shadow-sm">
-          {events.map((event) => (
-            <EventCard key={event.id} {...event} />
-          ))}
+    <>
+      <SearchBar onSearch={handleSearch} />
+      <div className="container mx-auto p-6">
+        <div className="max-w-screen-lg mx-auto">
+          <h1 className="text-2xl font-bold text-gray-800 mb-6">Upcoming Events</h1>
+          <div className="bg-white border rounded-lg shadow-sm">
+            {events.length > 0 ? (
+              events.map((event) => <EventCard key={event.id} {...event} />)
+            ) : (
+              <p>No events found.</p>
+            )}
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

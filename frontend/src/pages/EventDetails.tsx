@@ -36,7 +36,6 @@ const EventDetailsPage: React.FC = () => {
       const ticketRes = await api.get(`api/event/${id}/tickets/`);
       setTickets(ticketRes.data);
     } catch (error) {
-      alert("Failed to fetch tickets. Please try again.");
       console.error(error);
     } finally {
       setLoading(false);
@@ -47,7 +46,6 @@ const EventDetailsPage: React.FC = () => {
       const ticketRes = await api.get(`api/event/${id}/reservation/`);
       setReservedTickets(ticketRes.data);
     } catch (error) {
-      alert("Failed to fetch reserved tickets. Please try again.");
       console.error(error);
     }
   }

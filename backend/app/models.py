@@ -87,7 +87,7 @@ class Reservation(models.Model):
     is_finalized = models.BooleanField(default=False)
 
     def release(self):
-        if self.expires_at < now():
+        if self.expires_at < now() & self.is_finalized == False:
             for ticket in self.tickets.all():
                 ticket.is_reserved = False
                 ticket.save()
