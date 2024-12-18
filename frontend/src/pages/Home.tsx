@@ -16,7 +16,7 @@ const Home: React.FC = () => {
   useEffect(() => {
     getLocations();
     getEvents(filters);
-  }, []);
+  });
 
   const getEvents = useCallback(async (filters: { eventName: string; location: string; date: string }) => {
     try {

@@ -3,16 +3,16 @@ import api from "../api";
 import { AuthContext } from "../context/Auth";
 import { useNavigate } from "react-router-dom";
 
-const CreateEventPage: React.FC = () => {
+const CreateTicketPage: React.FC = () => {
   const { user, loading } = useContext(AuthContext);
-  const [eventData, setEventData] = useState({
-    name: "",
-    description: "",
-    category: "",
-    start_datetime: "",
-    end_datetime: "",
-    location: "",
-    organizer: "",
+  const [ticketData, setTicketData] = useState({
+    event: "",
+    price: "",
+    owner: null,
+    sector: "",
+    row: "",
+    seat: "",
+    isReserved: false,
   });
 
   const navigate = useNavigate();
@@ -26,34 +26,34 @@ const CreateEventPage: React.FC = () => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setEventData({ ...eventData, [name]: value });
+    setTicketData({ ...ticketData, [name]: value });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
-      await api.post("api/event/", eventData);
-      setMessage("Event created successfully!");
+      await api.post("api/ticket/", ticketData);
+      setMessage("Ticket created successfully!");
     } catch (error) {
-      setMessage("Failed to create event. Please try again.");
+      setMessage("Failed to create ticket. Please try again.");
       console.error(error);
     }
   };
 
   return (
     <div className="container mx-auto p-6 max-w-4xl">
-      <h1 className="text-2xl font-bold text-gray-800 mb-6">Create Event</h1>
+      <h1 className="text-2xl font-bold text-gray-800 mb-6">Create Ticket</h1>
       <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-sm">
         <div className="mb-4">
           <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-            Event Name
+            Event ID
           </label>
           <input
             type="text"
             name="name"
             id="name"
-            value={eventData.name}
+            value={ticketData.event}
             onChange={handleInputChange}
             className="mt-1 p-2 border border-gray-300 rounded w-full"
             required
@@ -61,12 +61,12 @@ const CreateEventPage: React.FC = () => {
         </div>
         <div className="mb-4">
           <label htmlFor="description" className="block text-sm font-medium text-gray-700">
-            Description
+            Price
           </label>
           <textarea
             name="description"
             id="description"
-            value={eventData.description}
+            value={ticketData.price}
             onChange={handleInputChange}
             className="mt-1 p-2 border border-gray-300 rounded w-full"
             rows={4}
@@ -75,13 +75,13 @@ const CreateEventPage: React.FC = () => {
         </div>
         <div className="mb-4">
           <label htmlFor="category" className="block text-sm font-medium text-gray-700">
-            Category
+            Sector
           </label>
           <input
             type="text"
             name="category"
             id="category"
-            value={eventData.category}
+            value={ticketData.sector}
             onChange={handleInputChange}
             className="mt-1 p-2 border border-gray-300 rounded w-full"
             required
@@ -89,13 +89,13 @@ const CreateEventPage: React.FC = () => {
         </div>
         <div className="mb-4">
           <label htmlFor="start_datetime" className="block text-sm font-medium text-gray-700">
-            Start Date & Time
+            Row
           </label>
           <input
             type="datetime-local"
             name="start_datetime"
             id="start_datetime"
-            value={eventData.start_datetime}
+            value={ticketData.row}
             onChange={handleInputChange}
             className="mt-1 p-2 border border-gray-300 rounded w-full"
             required
@@ -103,51 +103,23 @@ const CreateEventPage: React.FC = () => {
         </div>
         <div className="mb-4">
           <label htmlFor="end_datetime" className="block text-sm font-medium text-gray-700">
-            End Date & Time
+            Seat
           </label>
           <input
             type="datetime-local"
             name="end_datetime"
             id="end_datetime"
-            value={eventData.end_datetime}
+            value={ticketData.seat}
             onChange={handleInputChange}
             className="mt-1 p-2 border border-gray-300 rounded w-full"
             required
           />
-        </div>
-        <div className="mb-4">
-          <label htmlFor="location" className="block text-sm font-medium text-gray-700">
-            Location ID
-          </label>
-          <input
-            type="text"
-            name="location"
-            id="location"
-            value={eventData.location}
-            onChange={handleInputChange}
-            className="mt-1 p-2 border border-gray-300 rounded w-full"
-            required
-          />
-        </div>
-        <div className="mb-4">
-          <label htmlFor="organizer" className="block text-sm font-medium text-gray-700">
-            Organizer
-          </label>
-          <input
-            type="text"
-            name="organizer"
-            id="organizer"
-            value={eventData.organizer}
-            onChange={handleInputChange}
-            className="mt-1 p-2 border border-gray-300 rounded w-full"
-            required
-          ></input>
         </div>
         <button
           type="submit"
           className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition"
         >
-          Create Event
+          Create Ticket
         </button>
       </form>
       {message && <div className="mt-4 text-lg">{message}</div>}
@@ -155,4 +127,4 @@ const CreateEventPage: React.FC = () => {
   );
 };
 
-export default CreateEventPage;
+export default CreateTicketPage;

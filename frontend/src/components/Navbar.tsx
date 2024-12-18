@@ -31,13 +31,21 @@ const Navbar: React.FC = () => {
             >
               Tech
             </a>
-            { user?.is_organizer && (
-              <a
-                href="/event/create"
-                className="text-gray-600 hover:text-purple-600 border-b-2 border-transparent hover:border-purple-600 transition"
-              >
-                Create Event
-              </a>
+            {user?.is_organizer && (
+              <>
+                <a
+                  href="/event/create"
+                  className="text-gray-600 hover:text-purple-600 border-b-2 border-transparent hover:border-purple-600 transition"
+                >
+                  Create Event
+                </a>
+                <a
+                  href="/ticket/create"
+                  className="text-gray-600 hover:text-purple-600 border-b-2 border-transparent hover:border-purple-600 transition"
+                >
+                  Create Ticket
+                </a>
+              </>
             )}
           </div>
         </div>

@@ -259,7 +259,7 @@ def EventTickets(request, pk):
 
 # api/ticket/
 @api_view(['POST', 'GET'])
-@permission_classes([IsSuperUser])
+@permission_classes([IsOrganizerOrReadOnly])
 def TicketList(request):
     if request.method == 'POST':
         serializer = TicketSerializer(data=request.data)

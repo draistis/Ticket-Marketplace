@@ -13,8 +13,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   }, [user]);
 
   useEffect(() => {
-    setLoading(true);
     const checkAuthStatus = async () => {
+      setLoading(true);
       try {
         const response = await api.post("api/auth/verify/");
         if (response.status !== 200) {
@@ -34,12 +34,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         setUser(null);
         setIsAuthenticated(false);
       }
+      setLoading(false);
     };
 
     checkAuthStatus();
   }, []);
 
   const logout = async () => {
+    setLoading(true);
     try {
       const response = await api.post("api/logout/");
       if (response.status !== 204) {
@@ -50,9 +52,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     } catch (error) {
       console.error("Logout failed:", error);
     }
+    setLoading(false);
   };
 
   const login = async (email: string, password: string) => {
+    setLoading(true);
     try {
       const response = await api.post("api/auth/", { email, password });
       setUser({
@@ -63,14 +67,15 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         is_organizer: response.data.is_organizer,
       });
       setIsAuthenticated(true);
+      setLoading(false);
       return true;
     } catch (error) {
       console.error("Login failed:", error);
       setUser(null);
       setIsAuthenticated(false);
+      setLoading(false);
       return false;
     }
-    setLoading(false);
   };
 
   return (

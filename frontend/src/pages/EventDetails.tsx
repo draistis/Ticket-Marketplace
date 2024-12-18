@@ -18,7 +18,7 @@ const EventDetailsPage: React.FC = () => {
     getEventDetails();
     getTickets();
     getReservedTickets();
-  }, []);
+  });
 
   async function getEventDetails() {
     try {
